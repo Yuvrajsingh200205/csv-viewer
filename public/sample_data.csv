@@ -1,0 +1,51 @@
+id,name,department,role,salary,city,joining_date
+1,Kabir Brown,Sales,Sales Development Rep,45500,Austin,2015-10-24
+2,Olivia Rao,Finance,Financial Analyst,94000,London,2020-09-09
+3,Priya Johnson,Sales,Sales Manager,109500,Mumbai,2017-09-12
+4,Ava Moore,Engineering,DevOps Engineer,91000,Singapore,2017-07-03
+5,Priya Thomas,Finance,Accountant,58500,Bengaluru,2017-06-24
+6,Ava Brown,Marketing,Content Strategist,60500,Mumbai,2021-01-23
+7,Vihaan Davis,Finance,Finance Manager,113000,Singapore,2016-02-27
+8,Vihaan Mehta,Marketing,Marketing Manager,125000,Mumbai,2022-12-26
+9,Vihaan Patel,Finance,Financial Analyst,80500,Austin,2022-08-18
+10,Mia Kapoor,Sales,Sales Development Rep,59000,San Francisco,2019-01-21
+11,Ananya Garcia,HR,HR Generalist,52500,San Francisco,2021-06-10
+12,Mason Khan,Marketing,SEO Specialist,68500,Singapore,2018-03-25
+13,Liam Williams,Finance,Accountant,62500,Berlin,2023-06-29
+14,Noah Khan,Sales,Account Executive,84000,Austin,2015-11-14
+15,Vihaan Kapoor,Marketing,SEO Specialist,65500,Pune,2021-08-31
+16,Vihaan Singh,Engineering,Software Engineer,96000,Mumbai,2020-04-25
+17,Priya Davis,HR,HR Manager,129500,Pune,2024-03-20
+18,Sophia Wilson,HR,Talent Acquisition Specialist,54500,Berlin,2020-03-06
+19,Emma Nair,Engineering,QA Engineer,89000,San Francisco,2017-06-12
+20,Noah Iyer,Sales,Sales Manager,135500,Mumbai,2020-07-26
+21,Emma Singh,Sales,Sales Development Rep,53000,New York,2024-11-27
+22,Mia Anderson,Marketing,SEO Specialist,67500,Toronto,2019-01-09
+23,Ananya Brown,Engineering,Senior Software Engineer,117000,London,2017-08-08
+24,Aarav Khan,Operations,Business Analyst,70000,San Francisco,2017-12-12
+25,Aarav Brown,Sales,Sales Development Rep,56000,Singapore,2021-11-02
+26,Leo Taylor,Finance,Finance Manager,129000,Bengaluru,2023-04-19
+27,Arjun Anderson,Sales,Sales Manager,120000,Mumbai,2019-06-03
+28,Zara Wilson,Engineering,Senior Software Engineer,114000,Pune,2017-05-05
+29,Emma Williams,Marketing,SEO Specialist,55500,Bengaluru,2016-02-24
+30,Vihaan Brown,Finance,Financial Analyst,76000,Bengaluru,2021-11-18
+31,Liam Mehta,Finance,Accountant,62000,San Francisco,2022-02-11
+32,Isha Nair,Marketing,Content Strategist,60000,Pune,2016-04-17
+33,Arjun Khan,Sales,Sales Manager,110000,Mumbai,2016-08-13
+34,Nora Kapoor,HR,Talent Acquisition Specialist,69500,New York,2024-04-17
+35,Mason Sharma,Design,Design Lead,114000,Austin,2016-08-23
+36,Aarav Taylor,Marketing,SEO Specialist,82500,San Francisco,2016-01-08
+37,Mason Rao,Design,UX Researcher,99500,Austin,2017-07-01
+38,Ava Taylor,Marketing,SEO Specialist,61500,London,2021-11-16
+39,Ananya Wilson,HR,HR Generalist,56500,Pune,2020-10-21
+40,Isha Sharma,Engineering,Engineering Manager,102500,London,2017-11-27
+41,Leo Nair,Marketing,Content Strategist,82500,Berlin,2023-02-09
+42,Isha Johnson,Design,Product Designer,84500,London,2020-04-09
+43,Kabir Mehta,Sales,Sales Development Rep,73500,Bengaluru,2021-11-04
+44,Zara Rao,Operations,Business Analyst,67000,Mumbai,2024-05-11
+45,Lucas Mehta,Sales,Account Executive,76000,Berlin,2023-11-07
+46,Liam Wilson,Sales,Sales Manager,131500,New York,2015-12-14
+47,Emma Brown,Engineering,Senior Software Engineer,131500,Pune,2025-02-23
+48,James Brown,Finance,Finance Manager,122500,Berlin,2022-05-16
+49,Noah Anderson,Finance,Financial Analyst,64500,Mumbai,2015-02-28
+50,Mason Brown,Sales,Account Executive,89000,London,2024-10-19
