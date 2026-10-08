@@ -14,6 +14,7 @@ Upload a CSV file and explore it in a fast, filterable, sortable table — entir
 - **Column filters**: add as many rules as you like (column + operator + value). Rules combine with AND.
   - Text: contains, equals, starts with, ends with (case-insensitive)
   - Number (auto-detected): `=`, `>`, `<`, `>=`, `<=`, between
+  - Date (auto-detected): between (a date range, the default), on, before, after, on or before, on or after — picked with a date picker and compared by calendar day, so mixed formats (`2024-03-01`, `03/01/2024`, `Mar 1, 2024`) and timestamps all match the day they fall on
 - **Active filter chips**: each can be removed on its own, and "Clear all filters" resets everything. A live result count shows "Showing 42 of 1,200 rows".
 - **Column visibility toggle**: show or hide columns.
 - **Export**: download the filtered and sorted rows (visible columns only) as a CSV file.

@@ -13,12 +13,18 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
   const column = columns[rule.columnIndex] ?? columns[0];
   const operators = getOperatorsForType(column.type);
   const isNumber = column.type === COLUMN_TYPES.NUMBER;
-  const isBetween = isNumber && rule.operator === 'between';
+  const isDate = column.type === COLUMN_TYPES.DATE;
+  const isBetween = (isNumber || isDate) && rule.operator === 'between';
+  const isDateRange = isDate && isBetween;
   const idPrefix = `filter-${rule.id}`;
 
-  const valueInputProps = isNumber
-    ? { type: 'number', inputMode: 'decimal', step: 'any' }
-    : { type: 'text', autoComplete: 'off', spellCheck: false };
+  let valueInputProps = { type: 'text', autoComplete: 'off', spellCheck: false };
+  if (isNumber) valueInputProps = { type: 'number', inputMode: 'decimal', step: 'any' };
+  else if (isDate) valueInputProps = { type: 'date' };
+
+  // Date pickers are self-describing, so they rely on their label instead of a placeholder.
+  const firstLabel = isDate ? 'Start date' : isBetween ? 'Minimum value' : 'Value';
+  const secondLabel = isDate ? 'End date' : 'Maximum value';
 
   return (
     <li className="animate-fade-in">
@@ -32,7 +38,11 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
       <div
         role="group"
         aria-label={`Filter rule ${position + 1}`}
-        className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_9rem_minmax(0,1.3fr)_auto]"
+        className={`grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2 ${
+          isDateRange
+            ? 'sm:grid-cols-[minmax(0,1fr)_9rem_auto]'
+            : 'sm:grid-cols-[minmax(0,1fr)_9rem_minmax(0,1.3fr)_auto]'
+        }`}
       >
         <label htmlFor={`${idPrefix}-column`} className="sr-only">
           Column
@@ -66,16 +76,20 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
           ))}
         </select>
 
-        <div className="order-last col-span-3 flex items-center gap-2 sm:order-none sm:col-span-1">
+        <div
+          className={`order-last col-span-3 flex items-center gap-2 ${
+            isDateRange ? '' : 'sm:order-none sm:col-span-1'
+          }`}
+        >
           <label htmlFor={`${idPrefix}-value`} className="sr-only">
-            {isBetween ? 'Minimum value' : 'Value'}
+            {firstLabel}
           </label>
           <input
             id={`${idPrefix}-value`}
             {...valueInputProps}
             value={rule.value}
             onChange={(event) => onUpdate(rule.id, { value: event.target.value })}
-            placeholder={isBetween ? 'Min' : 'Value'}
+            placeholder={isDate ? undefined : isBetween ? 'Min' : 'Value'}
             className="input w-full min-w-0"
           />
           {isBetween && (
@@ -84,14 +98,14 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
                 to
               </span>
               <label htmlFor={`${idPrefix}-value2`} className="sr-only">
-                Maximum value
+                {secondLabel}
               </label>
               <input
                 id={`${idPrefix}-value2`}
                 {...valueInputProps}
                 value={rule.value2}
                 onChange={(event) => onUpdate(rule.id, { value2: event.target.value })}
-                placeholder="Max"
+                placeholder={isDate ? undefined : 'Max'}
                 className="input w-full min-w-0"
               />
             </>

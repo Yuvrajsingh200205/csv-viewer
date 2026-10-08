@@ -10,11 +10,13 @@ import {
 const BOM_REGEX = /^﻿/;
 const NUMBER_REGEX = /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i;
 const CURRENCY_PREFIX_REGEX = /^[$€£¥₹]\s?/;
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const DATE_HINT_REGEX =
   /^(?:\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}(?:[T\s]\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?|[A-Za-z]{3,9}\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+[A-Za-z]{3,9}\.?,?\s+\d{4})$/;
 
 const textCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 const numberFormatter = new Intl.NumberFormat();
+const dayFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
 
 /** Error whose message is safe to show to the user as-is. */
 export class CsvParseError extends Error {
@@ -60,6 +62,33 @@ export function parseDate(value) {
   if (!text || !DATE_HINT_REGEX.test(text)) return null;
   const time = Date.parse(text);
   return Number.isNaN(time) ? null : time;
+}
+
+/**
+ * Reduces a date-like value to a comparable calendar day number (2024-03-01 -> 20240301).
+ * Comparing whole days keeps date filters free of time-of-day and timezone surprises:
+ * bare ISO dates parse as UTC midnight while every other accepted format parses as local
+ * time, so raw timestamps from the same calendar day can sit hours apart.
+ * @param {unknown} value A cell value or a date input's "YYYY-MM-DD" value.
+ * @returns {number|null} The day number, or null when the value is not a date.
+ */
+export function toDayNumber(value) {
+  const text = String(value ?? '').trim();
+  if (ISO_DATE_REGEX.test(text)) return Number(text.replace(/-/g, ''));
+
+  const time = parseDate(text);
+  if (time === null) return null;
+
+  // Everything left parses in local time, so local getters give the intended calendar day.
+  const date = new Date(time);
+  return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+}
+
+/** Formats a day number (20240301) as a readable date ("Mar 1, 2024"). */
+export function formatDayNumber(dayNumber) {
+  const year = Math.floor(dayNumber / 10000);
+  const month = Math.floor(dayNumber / 100) % 100;
+  return dayFormatter.format(new Date(Date.UTC(year, month - 1, dayNumber % 100)));
 }
 
 const isNullish = (value) => NULL_TOKENS.has(String(value).trim().toLowerCase());

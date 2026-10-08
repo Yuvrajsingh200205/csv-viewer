@@ -1,13 +1,16 @@
-import { COLUMN_TYPES, NUMBER_OPERATORS, TEXT_OPERATORS } from '../constants';
-import { parseNumber } from './csvHelpers';
+import { COLUMN_TYPES, DATE_OPERATORS, NUMBER_OPERATORS, TEXT_OPERATORS } from '../constants';
+import { formatDayNumber, parseNumber, toDayNumber } from './csvHelpers';
 
 let ruleCounter = 0;
 
 const isNumberColumn = (column) => column?.type === COLUMN_TYPES.NUMBER;
+const isDateColumn = (column) => column?.type === COLUMN_TYPES.DATE;
 
-/** Returns the operator list for a column type (dates and text share text operators). */
+/** Returns the operator list for a column type. */
 export function getOperatorsForType(type) {
-  return type === COLUMN_TYPES.NUMBER ? NUMBER_OPERATORS : TEXT_OPERATORS;
+  if (type === COLUMN_TYPES.NUMBER) return NUMBER_OPERATORS;
+  if (type === COLUMN_TYPES.DATE) return DATE_OPERATORS;
+  return TEXT_OPERATORS;
 }
 
 /** Returns the first (default) operator for a column type. */
@@ -45,6 +48,10 @@ export function isRuleActive(rule, column) {
     if (parseNumber(rule.value) === null) return false;
     return rule.operator !== 'between' || parseNumber(rule.value2) !== null;
   }
+  if (isDateColumn(column)) {
+    if (toDayNumber(rule.value) === null) return false;
+    return rule.operator !== 'between' || toDayNumber(rule.value2) !== null;
+  }
   return rule.value.trim() !== '';
 }
 
@@ -81,6 +88,33 @@ function compileNumberRule(rule, columnIndex) {
   };
 }
 
+/**
+ * Compiles a date rule into a fast predicate over a row's cells.
+ * Comparisons run on calendar day numbers, so "between" is an inclusive range of whole
+ * days and the two bounds may be entered in either order.
+ */
+function compileDateRule(rule, columnIndex) {
+  const a = toDayNumber(rule.value);
+  const b = toDayNumber(rule.value2);
+  const low = Math.min(a, b);
+  const high = Math.max(a, b);
+
+  const compare = {
+    on: (day) => day === a,
+    before: (day) => day < a,
+    after: (day) => day > a,
+    onOrBefore: (day) => day <= a,
+    onOrAfter: (day) => day >= a,
+    between: (day) => day >= low && day <= high,
+  }[rule.operator];
+
+  if (!compare) return () => true;
+  return (cells) => {
+    const day = toDayNumber(cells[columnIndex]);
+    return day !== null && compare(day);
+  };
+}
+
 /** Compiles a text rule (case-insensitive) into a fast predicate over a row's cells. */
 function compileTextRule(rule, columnIndex) {
   const query = rule.value.trim().toLowerCase();
@@ -104,11 +138,11 @@ function compileTextRule(rule, columnIndex) {
  */
 export function buildRowPredicate(activeRules, searchTerm) {
   const term = searchTerm.trim().toLowerCase();
-  const tests = activeRules.map(({ rule, column }) =>
-    isNumberColumn(column)
-      ? compileNumberRule(rule, column.index)
-      : compileTextRule(rule, column.index),
-  );
+  const tests = activeRules.map(({ rule, column }) => {
+    if (isNumberColumn(column)) return compileNumberRule(rule, column.index);
+    if (isDateColumn(column)) return compileDateRule(rule, column.index);
+    return compileTextRule(rule, column.index);
+  });
 
   if (!term && tests.length === 0) return null;
 
@@ -124,6 +158,14 @@ export function describeRule({ rule, column }) {
       return `${column.label} between ${rule.value.trim()} and ${rule.value2.trim()}`;
     }
     return `${column.label} ${operator} ${rule.value.trim()}`;
+  }
+  if (isDateColumn(column)) {
+    const from = toDayNumber(rule.value);
+    if (rule.operator !== 'between') return `${column.label} ${operator} ${formatDayNumber(from)}`;
+    // Bounds read in chronological order even when they were entered the other way round.
+    const to = toDayNumber(rule.value2);
+    const [start, end] = from <= to ? [from, to] : [to, from];
+    return `${column.label} between ${formatDayNumber(start)} and ${formatDayNumber(end)}`;
   }
   return `${column.label} ${operator} “${rule.value.trim()}”`;
 }

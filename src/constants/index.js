@@ -54,5 +54,15 @@ export const NUMBER_OPERATORS = [
   { value: 'between', label: 'between' },
 ];
 
+/** Date columns compare by calendar day; "between" (first = default) is an inclusive range. */
+export const DATE_OPERATORS = [
+  { value: 'between', label: 'between' },
+  { value: 'on', label: 'on' },
+  { value: 'before', label: 'before' },
+  { value: 'after', label: 'after' },
+  { value: 'onOrBefore', label: 'on or before' },
+  { value: 'onOrAfter', label: 'on or after' },
+];
+
 /** Cell values treated as "empty" when detecting a column's type. */
 export const NULL_TOKENS = new Set(['', 'na', 'n/a', 'null', 'none', 'nil', '-', '—', 'nan']);
