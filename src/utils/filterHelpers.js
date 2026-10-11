@@ -1,5 +1,5 @@
-import { COLUMN_TYPES, DATE_OPERATORS, NUMBER_OPERATORS, TEXT_OPERATORS } from '../constants';
-import { formatDayNumber, parseNumber, toDayNumber } from './csvHelpers';
+import { COLUMN_TYPES, DATE_OPERATORS, DATE_PRESETS, NUMBER_OPERATORS, TEXT_OPERATORS } from '../constants';
+import { formatDayNumber, parseNumber, toDateInputValue, toDayNumber } from './csvHelpers';
 
 let ruleCounter = 0;
 
@@ -36,6 +36,47 @@ export function createRule(column) {
     value: '',
     value2: '',
   };
+}
+
+/**
+ * Resolves a quick-range preset into the inclusive bounds a date rule needs.
+ * Ranges are built from local calendar parts, so they line up with the day numbers
+ * date filters compare on. Out-of-range day arguments roll over by design
+ * ("day 0" of this month is the last day of the previous one).
+ * @param {string} preset One of DATE_PRESETS' values.
+ * @param {Date} [today] Reference day, injectable for tests.
+ * @returns {{value:string,value2:string}|null} Date-input values, or null when unknown.
+ */
+export function getDatePresetRange(preset, today = new Date()) {
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const date = today.getDate();
+  const day = (y, m, d) => new Date(y, m, d);
+
+  const resolve = {
+    today: () => [day(year, month, date), day(year, month, date)],
+    yesterday: () => [day(year, month, date - 1), day(year, month, date - 1)],
+    last7: () => [day(year, month, date - 6), day(year, month, date)],
+    last30: () => [day(year, month, date - 29), day(year, month, date)],
+    mtd: () => [day(year, month, 1), day(year, month, date)],
+    lastMonth: () => [day(year, month - 1, 1), day(year, month, 0)],
+    qtd: () => [day(year, Math.floor(month / 3) * 3, 1), day(year, month, date)],
+    ytd: () => [day(year, 0, 1), day(year, month, date)],
+  }[preset];
+
+  if (!resolve) return null;
+  const [start, end] = resolve();
+  return { value: toDateInputValue(start), value2: toDateInputValue(end) };
+}
+
+/** Returns the preset a date rule currently matches, or null when its range is custom. */
+export function matchDatePreset(rule) {
+  if (rule.operator !== 'between') return null;
+  const match = DATE_PRESETS.find((preset) => {
+    const range = getDatePresetRange(preset.value);
+    return range.value === rule.value && range.value2 === rule.value2;
+  });
+  return match?.value ?? null;
 }
 
 /**

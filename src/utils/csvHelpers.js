@@ -91,6 +91,13 @@ export function formatDayNumber(dayNumber) {
   return dayFormatter.format(new Date(Date.UTC(year, month - 1, dayNumber % 100)));
 }
 
+/** Formats a Date as the local "YYYY-MM-DD" string a date input expects. */
+export function toDateInputValue(date) {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 const isNullish = (value) => NULL_TOKENS.has(String(value).trim().toLowerCase());
 
 /**

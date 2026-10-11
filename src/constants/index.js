@@ -64,5 +64,17 @@ export const DATE_OPERATORS = [
   { value: 'onOrAfter', label: 'on or after' },
 ];
 
+/** One-click ranges offered under a date filter; each resolves to an inclusive "between". */
+export const DATE_PRESETS = [
+  { value: 'today', label: 'Today' },
+  { value: 'yesterday', label: 'Yesterday' },
+  { value: 'last7', label: 'Last 7 days' },
+  { value: 'last30', label: 'Last 30 days' },
+  { value: 'mtd', label: 'Month to date' },
+  { value: 'lastMonth', label: 'Last month' },
+  { value: 'qtd', label: 'Quarter to date' },
+  { value: 'ytd', label: 'Year to date' },
+];
+
 /** Cell values treated as "empty" when detecting a column's type. */
 export const NULL_TOKENS = new Set(['', 'na', 'n/a', 'null', 'none', 'nil', '-', '—', 'nan']);

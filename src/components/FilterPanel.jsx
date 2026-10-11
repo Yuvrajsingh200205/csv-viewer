@@ -1,7 +1,7 @@
 import { ChevronDown, Plus, SlidersHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { COLUMN_TYPES } from '../constants';
-import { getOperatorsForType } from '../utils/filterHelpers';
+import { COLUMN_TYPES, DATE_PRESETS } from '../constants';
+import { getDatePresetRange, getOperatorsForType, matchDatePreset } from '../utils/filterHelpers';
 
 const DESKTOP_QUERY = '(min-width: 1024px)';
 
@@ -17,6 +17,11 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
   const isBetween = (isNumber || isDate) && rule.operator === 'between';
   const isDateRange = isDate && isBetween;
   const idPrefix = `filter-${rule.id}`;
+  const activePreset = isDate ? matchDatePreset(rule) : null;
+
+  // A preset always lands on an inclusive range, so it switches the operator to "between".
+  const applyPreset = (preset) =>
+    onUpdate(rule.id, { operator: 'between', ...getDatePresetRange(preset) });
 
   let valueInputProps = { type: 'text', autoComplete: 'off', spellCheck: false };
   if (isNumber) valueInputProps = { type: 'number', inputMode: 'decimal', step: 'any' };
@@ -122,6 +127,30 @@ function FilterRule({ rule, position, columns, onUpdate, onRemove }) {
           <Trash2 className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
+
+      {isDate && (
+        <div
+          role="group"
+          aria-label={`Quick date ranges for filter rule ${position + 1}`}
+          className="mt-2 flex flex-wrap gap-1.5"
+        >
+          {DATE_PRESETS.map((preset) => (
+            <button
+              key={preset.value}
+              type="button"
+              onClick={() => applyPreset(preset.value)}
+              aria-pressed={activePreset === preset.value}
+              className={`focus-ring rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                activePreset === preset.value
+                  ? 'border-indigo-600 bg-indigo-600 text-white'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      )}
     </li>
   );
 }
